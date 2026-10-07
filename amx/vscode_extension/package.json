@@ -3,7 +3,7 @@
   "displayName": "Agent Mux",
   "description": "Save and switch Codex accounts in your normal VS Code window while preserving shared history and settings.",
   "icon": "images/icon.png",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "megdev",
   "license": "MIT",
   "pricing": "Free",

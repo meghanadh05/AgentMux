@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Added cancellable new-account sign-in with automatic authentication recovery.
+- Aligned the Marketplace identity and display name with Agent Mux.
+
 ## 0.1.0
 
 - Initial Marketplace release of Agent Mux.
