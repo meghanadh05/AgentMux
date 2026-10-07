@@ -2,6 +2,6 @@
 
 ## 0.1.0
 
-- Add the cross-platform authenticated reload bridge.
-- Add an account switcher Quick Pick and status-bar indicator.
-- Add configurable AgentMux CLI path support.
+- Initial Marketplace release of AgentMux Account Switcher.
+- Added Codex account saving, switching, isolated login, recovery, and VS Code account management.
+- Added the cross-platform authenticated reload bridge and configurable CLI path.
