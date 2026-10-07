@@ -1,10 +1,10 @@
 {
-  "name": "amx-agent-account-manager",
+  "name": "agent-mux",
   "displayName": "AMX-Agent Account Manager",
   "description": "Save and switch Codex accounts in your normal VS Code window while preserving shared history and settings.",
   "icon": "images/icon.png",
   "version": "0.1.0",
-  "publisher": "MegDev",
+  "publisher": "megdev",
   "license": "MIT",
   "pricing": "Free",
   "repository": {
