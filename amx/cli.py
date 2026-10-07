@@ -26,6 +26,7 @@ def build_parser() -> argparse.ArgumentParser:
     add.add_argument("name", nargs="*", help="Account name; spaces are allowed")
     login_add = commands.add_parser("login-add", help=argparse.SUPPRESS)
     login_add.add_argument("name", nargs="+", help=argparse.SUPPRESS)
+    login_add.add_argument("--cancel-file", type=Path, help=argparse.SUPPRESS)
     list_command = commands.add_parser("list", help="List registered Codex accounts")
     list_command.add_argument("--json", action="store_true", help=argparse.SUPPRESS)
     switch = commands.add_parser("switch", help="Switch the agent account in VS Code")
@@ -102,7 +103,7 @@ def main(argv: Optional[list[str]] = None) -> int:
             print(f"Registered current Codex authentication as: {account.name}")
             return 0
         if args.command == "login-add":
-            account = manager.login_and_add_account(" ".join(args.name))
+            account = manager.login_and_add_account(" ".join(args.name), cancel_file=args.cancel_file)
             print(f"Authenticated and registered Codex account: {account.name}")
             return 0
         if args.command == "list":

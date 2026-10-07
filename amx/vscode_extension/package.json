@@ -4,7 +4,7 @@
   "description": "Save and switch Codex accounts in your normal VS Code window while preserving shared history and settings.",
   "icon": "images/icon.png",
   "version": "0.1.0",
-  "publisher": "meghanadh05",
+  "publisher": "MegDev",
   "license": "MIT",
   "pricing": "Free",
   "repository": {

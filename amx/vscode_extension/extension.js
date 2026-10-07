@@ -173,10 +173,34 @@ async function loginAndAddAccount(agent) {
     "Open official login"
   );
   if (proceed !== "Open official login") return;
-  await vscode.window.withProgress(
-    { location: vscode.ProgressLocation.Notification, title: `Waiting for ${agent.label} sign-in...`, cancellable: false },
-    () => runAmx(["login-add", name.trim()], 600000)
-  );
+  const cancellationRoot = fs.mkdtempSync(path.join(os.tmpdir(), "agentmux-login-"));
+  const cancellationFile = path.join(cancellationRoot, "cancel");
+  let cancelled = false;
+  try {
+    await vscode.window.withProgress(
+      { location: vscode.ProgressLocation.Notification, title: `Waiting for ${agent.label} sign-in...`, cancellable: true },
+      async (_progress, token) => {
+        const cancellation = token.onCancellationRequested(() => {
+          cancelled = true;
+          fs.writeFileSync(cancellationFile, "cancelled", { mode: 0o600 });
+        });
+        try {
+          await runAmx(["login-add", "--cancel-file", cancellationFile, name.trim()], 600000);
+        } catch (error) {
+          if (!cancelled) throw error;
+        } finally {
+          cancellation.dispose();
+        }
+      }
+    );
+  } finally {
+    fs.rmSync(cancellationRoot, { recursive: true, force: true });
+  }
+  if (cancelled) {
+    await refreshStatus();
+    vscode.window.showInformationMessage("AgentMux cancelled sign-in and restored the previous account.");
+    return;
+  }
   await refreshStatus();
   vscode.window.showInformationMessage(`AgentMux authenticated and saved ${name.trim()}.`);
 }

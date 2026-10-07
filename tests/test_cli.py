@@ -71,6 +71,29 @@ class AuthSwitchTests(unittest.TestCase):
             self.assertEqual(manager.get_active_account().id, previous.id)
             self.assertEqual([view.account.name for view in manager.list_accounts()], ["Personal"])
 
+    def test_login_add_cancellation_restores_previous_authentication(self) -> None:
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            manager = self.manager(root)
+            previous = self.register(manager, "Personal", "personal")
+            cancel_file = root / "cancel"
+            cancel_file.write_text("cancelled", encoding="ascii")
+
+            class LoginProcess:
+                returncode = None
+
+                def poll(self): return None
+                def terminate(self): self.terminated = True
+                def communicate(self, timeout=None): return "", ""
+
+            with patch("amx.codex_vscode.shutil.which", return_value="codex"), \
+                    patch("amx.codex_vscode.subprocess.Popen", return_value=LoginProcess()):
+                with self.assertRaisesRegex(ValueError, "previous authentication was restored"):
+                    manager.login_and_add_account("Work", cancel_file=cancel_file)
+            self.assertIn("personal", manager.live_auth.read_text())
+            self.assertEqual(manager.get_active_account().id, previous.id)
+            self.assertEqual([view.account.name for view in manager.list_accounts()], ["Personal"])
+
     def test_switch_saves_latest_current_and_activates_target(self) -> None:
         with TemporaryDirectory() as tmp:
             manager = self.manager(Path(tmp))

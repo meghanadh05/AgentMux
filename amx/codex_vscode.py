@@ -132,7 +132,7 @@ class CodexVSCodeManager:
         self.store.save(config)
         return account, 0
 
-    def login_and_add_account(self, name: str) -> Account:
+    def login_and_add_account(self, name: str, *, cancel_file: Optional[Path] = None) -> Account:
         name = name.strip()
         if not name:
             raise ValueError("Account name cannot be empty.")
@@ -155,9 +155,7 @@ class CodexVSCodeManager:
             login_home = Path(login_directory)
             env["CODEX_HOME"] = str(login_home)
             try:
-                result = subprocess.run(
-                    [codex, "login"], capture_output=True, text=True, check=False, timeout=600, env=env
-                )
+                result = self._run_codex_login(codex, env, cancel_file)
                 if result.returncode:
                     detail = (result.stderr or result.stdout).strip()
                     raise RuntimeError(detail or "Codex login did not complete.")
@@ -184,6 +182,29 @@ class CodexVSCodeManager:
             latest.set_active_account(account)
             self.store.save(latest)
         return account
+
+    @staticmethod
+    def _run_codex_login(codex: str, env: dict[str, str], cancel_file: Optional[Path]):
+        if cancel_file is None:
+            return subprocess.run(
+                [codex, "login"], capture_output=True, text=True, check=False, timeout=600, env=env
+            )
+
+        process = subprocess.Popen([codex, "login"], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                   text=True, env=env)
+        deadline = time.monotonic() + 600
+        while process.poll() is None:
+            if cancel_file.exists():
+                process.terminate()
+                stdout, stderr = process.communicate(timeout=15)
+                return subprocess.CompletedProcess([codex, "login"], 1, stdout, stderr or "Sign-in cancelled.")
+            if time.monotonic() >= deadline:
+                process.terminate()
+                stdout, stderr = process.communicate(timeout=15)
+                return subprocess.CompletedProcess([codex, "login"], 1, stdout, stderr or "Codex login timed out.")
+            time.sleep(0.1)
+        stdout, stderr = process.communicate()
+        return subprocess.CompletedProcess([codex, "login"], process.returncode, stdout, stderr)
 
     def switch_account(self, selector: str, targets: Optional[list[str]] = None) -> SwitchResult:
         del targets
