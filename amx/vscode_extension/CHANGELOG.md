@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Made the one-click CLI setup install and configure `amx` automatically.
+
 ## 0.1.2
 
 - Added guided CLI installation when Agent Mux is installed on a new machine.

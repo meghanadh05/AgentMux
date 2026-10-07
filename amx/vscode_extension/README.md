@@ -16,7 +16,7 @@ Codex is the only supported provider in this release.
 
 ## Requirements
 
-The extension needs the local `amx` CLI. If it is missing, select **Install AgentMux-amx CLI** from the error prompt or Command Palette. The extension opens an integrated terminal with the install command; restart VS Code after it completes.
+The extension needs the local `amx` CLI. If it is missing, select **Install AgentMux-amx CLI** from the error prompt or Command Palette. It installs the CLI in the background, saves the executable path in VS Code settings, and refreshes automatically. Python 3 is required.
 
 To install manually from the cloned repository, keep `amx` available on VS Code's PATH:
 

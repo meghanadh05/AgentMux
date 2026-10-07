@@ -23,18 +23,14 @@ function amxCommand() {
   return vscode.workspace.getConfiguration("agentmux").get("commandPath", "amx");
 }
 
-function runAmx(args, timeout = 30000) {
+function runExecutable(command, args, timeout = 30000) {
   return new Promise((resolve, reject) => {
-    childProcess.execFile(amxCommand(), args, { encoding: "utf8", timeout }, (error, stdout, stderr) => {
+    childProcess.execFile(command, args, { encoding: "utf8", timeout }, (error, stdout, stderr) => {
       if (error) {
-        if (error.code === "ENOENT") {
-          const missing = new Error("AgentMux-amx CLI is not installed or is not on PATH.");
-          missing.code = "AMX_CLI_NOT_FOUND";
-          reject(missing);
-          return;
-        }
         const detail = (stderr || error.message || "AgentMux command failed").trim();
-        reject(new Error(detail));
+        const failure = new Error(detail);
+        failure.code = error.code;
+        reject(failure);
         return;
       }
       resolve(stdout.trim());
@@ -42,16 +38,55 @@ function runAmx(args, timeout = 30000) {
   });
 }
 
-function cliInstallCommand() {
-  const python = process.platform === "win32" ? "py" : "python3";
-  return `${python} -m pip install --user "${CLI_SOURCE}"`;
+async function runAmx(args, timeout = 30000) {
+  try {
+    return await runExecutable(amxCommand(), args, timeout);
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      const missing = new Error("AgentMux-amx CLI is not installed or is not on PATH.");
+      missing.code = "AMX_CLI_NOT_FOUND";
+      throw missing;
+    }
+    throw error;
+  }
 }
 
-function installCli() {
-  const terminal = vscode.window.createTerminal("AgentMux-amx Setup");
-  terminal.show(true);
-  terminal.sendText(cliInstallCommand(), true);
-  vscode.window.showInformationMessage("AgentMux-amx CLI installation started. Restart VS Code when it finishes.");
+function pythonCommands() {
+  return process.platform === "win32" ? ["py", "python"] : ["python3", "python"];
+}
+
+async function installCli() {
+  let lastError;
+  try {
+    await vscode.window.withProgress(
+      { location: vscode.ProgressLocation.Notification, title: "Installing AgentMux-amx CLI...", cancellable: false },
+      async () => {
+        for (const python of pythonCommands()) {
+          try {
+            await runExecutable(python, ["-m", "pip", "install", "--user", CLI_SOURCE], 180000);
+            const scripts = await runExecutable(python, ["-c", "import os, sysconfig; " +
+              "print(sysconfig.get_path('scripts', 'nt_user' if os.name == 'nt' else 'posix_user'))"]);
+            const executable = path.join(scripts, process.platform === "win32" ? "amx.exe" : "amx");
+            if (!fs.existsSync(executable)) throw new Error("The installed amx executable could not be found.");
+            await vscode.workspace.getConfiguration("agentmux").update(
+              "commandPath", executable, vscode.ConfigurationTarget.Global
+            );
+            return;
+          } catch (error) {
+            lastError = error;
+            if (error.code !== "ENOENT") throw error;
+          }
+        }
+        throw lastError || new Error("Python 3 was not found.");
+      }
+    );
+    await refreshStatus();
+    vscode.window.showInformationMessage("AgentMux-amx CLI installed and ready.");
+  } catch (error) {
+    vscode.window.showErrorMessage(
+      `AgentMux-amx could not install its CLI: ${error.message}. Install Python 3, then use Configure CLI Path.`
+    );
+  }
 }
 
 async function handleCliError(error) {
@@ -61,7 +96,7 @@ async function handleCliError(error) {
     "Install AgentMux-amx CLI",
     "Configure CLI Path"
   );
-  if (action === "Install AgentMux-amx CLI") installCli();
+  if (action === "Install AgentMux-amx CLI") await installCli();
   if (action === "Configure CLI Path") {
     vscode.commands.executeCommand("workbench.action.openSettings", "agentmux.commandPath");
   }
