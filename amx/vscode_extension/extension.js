@@ -23,9 +23,13 @@ function amxCommand() {
   return vscode.workspace.getConfiguration("agentmux").get("commandPath", "amx");
 }
 
-function runExecutable(command, args, timeout = 30000) {
+function codexCommand() {
+  return vscode.workspace.getConfiguration("agentmux").get("codexCommandPath", "").trim();
+}
+
+function runExecutable(command, args, timeout = 30000, env = process.env) {
   return new Promise((resolve, reject) => {
-    childProcess.execFile(command, args, { encoding: "utf8", timeout }, (error, stdout, stderr) => {
+    childProcess.execFile(command, args, { encoding: "utf8", timeout, env }, (error, stdout, stderr) => {
       if (error) {
         const detail = (stderr || error.message || "AgentMux command failed").trim();
         const failure = new Error(detail);
@@ -40,12 +44,19 @@ function runExecutable(command, args, timeout = 30000) {
 
 async function runAmx(args, timeout = 30000) {
   try {
-    return await runExecutable(amxCommand(), args, timeout);
+    const command = codexCommand();
+    return await runExecutable(amxCommand(), args, timeout, {
+      ...process.env,
+      ...(command ? { AMX_CODEX_COMMAND: command } : {})
+    });
   } catch (error) {
     if (error.code === "ENOENT") {
       const missing = new Error("AgentMux-amx CLI is not installed or is not on PATH.");
       missing.code = "AMX_CLI_NOT_FOUND";
       throw missing;
+    }
+    if (/Codex CLI was not found/i.test(error.message)) {
+      error.code = "CODEX_CLI_NOT_FOUND";
     }
     throw error;
   }
@@ -89,6 +100,48 @@ async function installCli() {
   }
 }
 
+function npmCommands() {
+  return process.platform === "win32" ? ["npm.cmd", "npm"] : ["npm"];
+}
+
+function codexExecutable(prefix) {
+  if (process.platform === "win32") return path.join(prefix, "codex.cmd");
+  return path.join(prefix, "bin", "codex");
+}
+
+async function installCodexCli() {
+  let lastError;
+  try {
+    await vscode.window.withProgress(
+      { location: vscode.ProgressLocation.Notification, title: "Installing official Codex CLI...", cancellable: false },
+      async () => {
+        for (const npm of npmCommands()) {
+          try {
+            await runExecutable(npm, ["install", "--global", "@openai/codex@latest"], 180000);
+            const prefix = await runExecutable(npm, ["prefix", "--global"]);
+            const executable = codexExecutable(prefix.trim());
+            if (!fs.existsSync(executable)) throw new Error("The installed codex executable could not be found.");
+            await vscode.workspace.getConfiguration("agentmux").update(
+              "codexCommandPath", executable, vscode.ConfigurationTarget.Global
+            );
+            return;
+          } catch (error) {
+            lastError = error;
+            if (error.code !== "ENOENT") throw error;
+          }
+        }
+        throw lastError || new Error("Node.js and npm were not found.");
+      }
+    );
+    await refreshStatus();
+    vscode.window.showInformationMessage("Official Codex CLI installed and ready. Continue with Sign in new account.");
+  } catch (error) {
+    vscode.window.showErrorMessage(
+      `Codex CLI could not be installed: ${error.message}. Install Node.js, then use Configure Codex CLI Path.`
+    );
+  }
+}
+
 async function handleCliError(error) {
   if (error?.code !== "AMX_CLI_NOT_FOUND") return false;
   const action = await vscode.window.showErrorMessage(
@@ -99,6 +152,20 @@ async function handleCliError(error) {
   if (action === "Install AgentMux-amx CLI") await installCli();
   if (action === "Configure CLI Path") {
     vscode.commands.executeCommand("workbench.action.openSettings", "agentmux.commandPath");
+  }
+  return true;
+}
+
+async function handleCodexCliError(error) {
+  if (error?.code !== "CODEX_CLI_NOT_FOUND") return false;
+  const action = await vscode.window.showErrorMessage(
+    "AgentMux-amx needs the official Codex CLI to sign in to a separate account.",
+    "Install Codex CLI",
+    "Configure Codex CLI Path"
+  );
+  if (action === "Install Codex CLI") await installCodexCli();
+  if (action === "Configure Codex CLI Path") {
+    vscode.commands.executeCommand("workbench.action.openSettings", "agentmux.codexCommandPath");
   }
   return true;
 }
@@ -281,6 +348,7 @@ async function switchAccount() {
     if (agent) await showAccounts(agent);
   } catch (error) {
     if (await handleCliError(error)) return;
+    if (await handleCodexCliError(error)) return;
     const action = await vscode.window.showErrorMessage(`AgentMux: ${error.message}`, "Open Settings");
     if (action === "Open Settings") vscode.commands.executeCommand("workbench.action.openSettings", "agentmux.commandPath");
   }
@@ -303,6 +371,7 @@ async function addAccount(selectedAgent) {
     vscode.window.showInformationMessage(`AgentMux saved the current ${agent.label} session as ${name.trim()}.`);
   } catch (error) {
     if (await handleCliError(error)) return;
+    if (await handleCodexCliError(error)) return;
     const action = await vscode.window.showErrorMessage(`AgentMux: ${error.message}`, "Open Settings");
     if (action === "Open Settings") {
       vscode.commands.executeCommand("workbench.action.openSettings", "agentmux.commandPath");
@@ -370,11 +439,12 @@ function activate(context) {
     vscode.commands.registerCommand("agentmux.switchAccount", switchAccount),
     vscode.commands.registerCommand("agentmux.addAccount", addAccount),
     vscode.commands.registerCommand("agentmux.installCli", installCli),
+    vscode.commands.registerCommand("agentmux.installCodexCli", installCodexCli),
     vscode.commands.registerCommand("agentmux.refreshStatus", refreshStatus),
     vscode.commands.registerCommand("agentmux.reloadWindow", () =>
       vscode.commands.executeCommand("workbench.action.reloadWindow")),
     vscode.workspace.onDidChangeConfiguration((event) => {
-      if (event.affectsConfiguration("agentmux.commandPath")) refreshStatus();
+      if (event.affectsConfiguration("agentmux.commandPath") || event.affectsConfiguration("agentmux.codexCommandPath")) refreshStatus();
     })
   );
   refreshStatus();

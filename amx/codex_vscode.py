@@ -136,8 +136,10 @@ class CodexVSCodeManager:
         name = name.strip()
         if not name:
             raise ValueError("Account name cannot be empty.")
-        self._validate_auth(self.live_auth, "Current Codex")
-        codex = shutil.which("codex")
+        has_existing_auth = self.live_auth.is_file()
+        if has_existing_auth:
+            self._validate_auth(self.live_auth, "Current Codex")
+        codex = self._codex_command()
         if not codex:
             raise FileNotFoundError("The Codex CLI was not found.")
         config = self.store.load()
@@ -146,9 +148,10 @@ class CodexVSCodeManager:
         previous = config.active_account("codex")
 
         with self._switch_lock(), tempfile.TemporaryDirectory(prefix="amx-codex-login-") as login_directory:
-            recovery = self._recovery_path()
-            self._atomic_copy(self.live_auth, recovery)
-            if previous:
+            recovery = self._recovery_path() if has_existing_auth else None
+            if recovery:
+                self._atomic_copy(self.live_auth, recovery)
+            if previous and has_existing_auth:
                 ensure_private_dir(Path(previous.home))
                 self._atomic_copy(self.live_auth, self.account_auth(previous))
             env = os.environ.copy()
@@ -167,12 +170,16 @@ class CodexVSCodeManager:
                 if not self._login_status():
                     raise RuntimeError("Codex did not report an authenticated session")
             except Exception as exc:
-                self._atomic_copy(recovery, self.live_auth)
-                try:
-                    self._refresh()
-                except Exception:
-                    pass
-                raise ValueError(f"Login failed and previous authentication was restored: {exc}") from exc
+                if recovery and recovery.is_file():
+                    self._atomic_copy(recovery, self.live_auth)
+                    try:
+                        self._refresh()
+                    except Exception:
+                        pass
+                    detail = "Login failed and previous authentication was restored"
+                else:
+                    detail = "Login failed without changing the existing account state"
+                raise ValueError(f"{detail}: {exc}") from exc
 
             latest = self.store.load()
             account = self.store.create_account(latest, "codex", name)
@@ -350,12 +357,20 @@ class CodexVSCodeManager:
         return digest(left) == digest(right)
 
     def codex_login_ready(self) -> bool:
+        codex = self._codex_command()
+        if not codex:
+            return False
         try:
-            result = subprocess.run(["codex", "login", "status"], capture_output=True, text=True, timeout=15,
+            result = subprocess.run([codex, "login", "status"], capture_output=True, text=True, timeout=15,
                                     check=False)
         except (OSError, subprocess.TimeoutExpired):
             return False
         return result.returncode == 0 and "logged in" in (result.stdout + result.stderr).casefold()
+
+    @staticmethod
+    def _codex_command() -> Optional[str]:
+        configured = os.environ.get("AMX_CODEX_COMMAND", "").strip()
+        return configured or shutil.which("codex")
 
     def reload_default_vscode(self) -> bool:
         before = self.default_app_server_pids()

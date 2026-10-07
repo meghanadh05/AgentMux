@@ -28,13 +28,13 @@ amx doctor
 
 For a custom executable location, set **AgentMux: Command Path** to the full `amx` path.
 
-The official Codex extension and Codex sign-in are separate requirements. AgentMux-amx never installs Codex or signs in on your behalf.
+The official Codex extension is a separate requirement. To use **Sign in new account**, AgentMux-amx also needs the official Codex CLI. If it is missing, choose **Install Codex CLI** from the prompt or Command Palette; this installs `@openai/codex` with npm and saves its executable path. Node.js and npm are required for that install.
 
 ## Account Actions
 
 **Add account** saves the Codex session currently signed in to VS Code under a name you choose.
 
-**Sign in new account** runs official `codex login` with a temporary isolated `CODEX_HOME`. The existing live credential remains untouched during browser authentication. AgentMux activates and records the new session only after login succeeds; failure restores the previous credential.
+**Sign in new account** runs official `codex login` with a temporary isolated `CODEX_HOME`. It works on a fresh machine with no existing session. When an existing session is present, it remains untouched during browser authentication and is restored if login fails. AgentMux activates and records the new session only after login succeeds.
 
 Use **Cancel** in the sign-in notification to stop the temporary login. AgentMux restores the previous active account and does not save a partial account.
 

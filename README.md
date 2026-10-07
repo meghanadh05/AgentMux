@@ -24,7 +24,8 @@ AgentMux saves complete Codex authentication artifacts under friendly account na
 
 - Python 3.9 or newer
 - Visual Studio Code with the `code` command available
-- Official Codex CLI and VS Code extension
+- Official Codex VS Code extension
+- Node.js and npm for **Sign in new account** (AgentMux can install the official Codex CLI automatically)
 
 To enable the `code` command on macOS, open the VS Code Command Palette and run **Shell Command: Install 'code' command in PATH**.
 
@@ -76,7 +77,7 @@ AgentMux copies the current opaque `~/.codex/auth.json` artifact. It never asks 
 4. Choose an AgentMux account name.
 5. Complete the official Codex browser login.
 
-The login runs with a temporary isolated `CODEX_HOME`; the existing live credential is not modified while authentication is in progress. After login succeeds, AgentMux atomically activates the new credential, reloads VS Code, verifies Codex login readiness, and records the account. Failure restores the previous credential.
+The login runs with a temporary isolated `CODEX_HOME` and also works on a brand-new machine with no existing Codex session. When a live credential exists, it is not modified while authentication is in progress. After login succeeds, AgentMux atomically activates the new credential, reloads VS Code, verifies Codex login readiness, and records the account. Failure restores the previous credential.
 
 ### Switch accounts
 

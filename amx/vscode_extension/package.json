@@ -3,7 +3,7 @@
   "displayName": "AgentMux-amx",
   "description": "Save and switch Codex accounts in your normal VS Code window while preserving shared history and settings.",
   "icon": "images/logo.png",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "publisher": "megdev",
   "license": "MIT",
   "pricing": "Free",
@@ -28,6 +28,7 @@
     "onCommand:agentmux.switchAccount",
     "onCommand:agentmux.addAccount",
     "onCommand:agentmux.installCli",
+    "onCommand:agentmux.installCodexCli",
     "onCommand:agentmux.refreshStatus",
     "onCommand:agentmux.reloadWindow"
   ],
@@ -44,6 +45,7 @@
       { "command": "agentmux.switchAccount", "title": "AgentMux-amx: Switch Account" },
       { "command": "agentmux.addAccount", "title": "AgentMux-amx: Add Account" },
       { "command": "agentmux.installCli", "title": "AgentMux-amx: Install CLI" },
+      { "command": "agentmux.installCodexCli", "title": "AgentMux-amx: Install Codex CLI" },
       { "command": "agentmux.refreshStatus", "title": "AgentMux-amx: Refresh Account Status" },
       { "command": "agentmux.reloadWindow", "title": "AgentMux-amx: Reload Window" }
     ],
@@ -54,6 +56,11 @@
           "type": "string",
           "default": "amx",
           "description": "Path to the AgentMux-amx CLI executable."
+        },
+        "agentmux.codexCommandPath": {
+          "type": "string",
+          "default": "",
+          "description": "Optional full path to the official Codex CLI executable."
         }
       }
     }

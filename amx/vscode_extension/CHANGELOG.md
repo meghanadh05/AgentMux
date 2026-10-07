@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5
+
+- Allow the first isolated Codex account login on a fresh machine.
+- Offer a guided, cross-platform official Codex CLI installation when it is missing.
+
 ## 0.1.4
 
 - Verified CLI and extension packaging on macOS, Windows, and Linux in CI.

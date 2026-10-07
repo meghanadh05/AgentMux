@@ -71,6 +71,21 @@ class AuthSwitchTests(unittest.TestCase):
             self.assertEqual(manager.get_active_account().id, previous.id)
             self.assertEqual([view.account.name for view in manager.list_accounts()], ["Personal"])
 
+    def test_login_add_allows_the_first_account_on_a_fresh_machine(self) -> None:
+        with TemporaryDirectory() as tmp:
+            manager = self.manager(Path(tmp))
+
+            def login(*args, **kwargs):
+                write_auth(Path(kwargs["env"]["CODEX_HOME"]) / "auth.json", "first-account")
+                return type("Result", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+            with patch("amx.codex_vscode.shutil.which", return_value="codex"), \
+                    patch("amx.codex_vscode.subprocess.run", side_effect=login):
+                account = manager.login_and_add_account("Personal")
+            self.assertEqual(account.name, "Personal")
+            self.assertIn("first-account", manager.live_auth.read_text())
+            self.assertEqual(manager.get_active_account().id, account.id)
+
     def test_login_add_cancellation_restores_previous_authentication(self) -> None:
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
