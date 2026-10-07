@@ -1,5 +1,5 @@
 {
-  "name": "agentmux-vscode",
+  "name": "amx-agent-account-manager",
   "displayName": "AMX-Agent Account Manager",
   "description": "Save and switch Codex accounts in your normal VS Code window while preserving shared history and settings.",
   "icon": "images/icon.png",

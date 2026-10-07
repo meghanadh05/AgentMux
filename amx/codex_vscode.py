@@ -562,7 +562,10 @@ class CodexVSCodeManager:
     @staticmethod
     def companion_installed() -> bool:
         root = Path.home() / ".vscode" / "extensions"
-        return root.exists() and any(root.glob("agentmux.agentmux-vscode-*/package.json"))
+        patterns = ("megdev.amx-agent-account-manager-*", "agentmux.agentmux-vscode-*")
+        return root.exists() and any(
+            package for pattern in patterns for package in root.glob(f"{pattern}/package.json")
+        )
 
     @staticmethod
     def install_companion() -> Path:
