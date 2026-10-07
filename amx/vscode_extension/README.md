@@ -16,10 +16,10 @@ Codex is the only supported provider in this release.
 
 ## Requirements
 
-Install the AgentMux CLI, install the companion, and keep `amx` available on VS Code's PATH:
+From the cloned AgentMux repository, install the CLI and companion and keep `amx` available on VS Code's PATH:
 
 ```bash
-python3 -m pip install amx
+python3 -m pip install -e .
 amx setup
 amx doctor
 ```
