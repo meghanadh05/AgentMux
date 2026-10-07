@@ -2,6 +2,6 @@
 
 ## 0.1.0
 
-- Initial Marketplace release of AMX-Agent Account Manager.
+- Initial Marketplace release of Agent Mux.
 - Added Codex account saving, switching, isolated login, recovery, and VS Code account management.
 - Added the cross-platform authenticated reload bridge and configurable CLI path.
