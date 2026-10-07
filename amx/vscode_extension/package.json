@@ -1,0 +1,46 @@
+{
+  "name": "agentmux-vscode",
+  "displayName": "AgentMux",
+  "description": "Cross-platform local reload bridge for the AgentMux CLI",
+  "version": "0.1.0",
+  "publisher": "agentmux",
+  "license": "MIT",
+  "pricing": "Free",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "keywords": ["codex", "accounts", "switcher", "agent"],
+  "extensionKind": ["ui"],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:agentmux.switchAccount",
+    "onCommand:agentmux.addAccount",
+    "onCommand:agentmux.refreshStatus",
+    "onCommand:agentmux.reloadWindow"
+  ],
+  "main": "./extension.js",
+  "scripts": {
+    "package": "vsce package --allow-missing-repository --no-dependencies",
+    "publish": "vsce publish --allow-missing-repository --no-dependencies"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.6.2"
+  },
+  "contributes": {
+    "commands": [
+      { "command": "agentmux.switchAccount", "title": "AgentMux: Switch Account" },
+      { "command": "agentmux.addAccount", "title": "AgentMux: Add Account" },
+      { "command": "agentmux.refreshStatus", "title": "AgentMux: Refresh Account Status" },
+      { "command": "agentmux.reloadWindow", "title": "AgentMux: Reload Window" }
+    ],
+    "configuration": {
+      "title": "AgentMux",
+      "properties": {
+        "agentmux.commandPath": {
+          "type": "string",
+          "default": "amx",
+          "description": "Path to the AgentMux CLI executable."
+        }
+      }
+    }
+  }
+}
