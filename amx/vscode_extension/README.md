@@ -1,10 +1,10 @@
-# AgentMux for VS Code
+# AgentMux-amx for VS Code
 
 Save and switch Codex accounts without leaving your normal VS Code window or separating local Codex history.
 
 ## What It Provides
 
-- **AgentMux** status-bar menu for provider and account selection
+- **AgentMux-amx** status-bar menu for provider and account selection
 - **+** status-bar action to save the current Codex session
 - **Sign in new account** using official Codex browser authentication in an isolated temporary home
 - Active and re-authentication-required account states
@@ -16,7 +16,7 @@ Codex is the only supported provider in this release.
 
 ## Requirements
 
-The extension needs the local `amx` CLI. If it is missing, select **Install Agent Mux CLI** from the error prompt or Command Palette. The extension opens an integrated terminal with the install command; restart VS Code after it completes.
+The extension needs the local `amx` CLI. If it is missing, select **Install AgentMux-amx CLI** from the error prompt or Command Palette. The extension opens an integrated terminal with the install command; restart VS Code after it completes.
 
 To install manually from the cloned repository, keep `amx` available on VS Code's PATH:
 
@@ -28,7 +28,7 @@ amx doctor
 
 For a custom executable location, set **AgentMux: Command Path** to the full `amx` path.
 
-The official Codex extension and Codex sign-in are separate requirements. Agent Mux never installs Codex or signs in on your behalf.
+The official Codex extension and Codex sign-in are separate requirements. AgentMux-amx never installs Codex or signs in on your behalf.
 
 ## Account Actions
 

@@ -1,8 +1,8 @@
 {
-  "name": "agent-mux",
-  "displayName": "Agent Mux",
+  "name": "agentmux-amx",
+  "displayName": "AgentMux-amx",
   "description": "Save and switch Codex accounts in your normal VS Code window while preserving shared history and settings.",
-  "icon": "images/icon.png",
+  "icon": "images/logo.png",
   "version": "0.1.2",
   "publisher": "megdev",
   "license": "MIT",
@@ -41,19 +41,19 @@
   },
   "contributes": {
     "commands": [
-      { "command": "agentmux.switchAccount", "title": "AgentMux: Switch Account" },
-      { "command": "agentmux.addAccount", "title": "AgentMux: Add Account" },
-      { "command": "agentmux.installCli", "title": "AgentMux: Install CLI" },
-      { "command": "agentmux.refreshStatus", "title": "AgentMux: Refresh Account Status" },
-      { "command": "agentmux.reloadWindow", "title": "AgentMux: Reload Window" }
+      { "command": "agentmux.switchAccount", "title": "AgentMux-amx: Switch Account" },
+      { "command": "agentmux.addAccount", "title": "AgentMux-amx: Add Account" },
+      { "command": "agentmux.installCli", "title": "AgentMux-amx: Install CLI" },
+      { "command": "agentmux.refreshStatus", "title": "AgentMux-amx: Refresh Account Status" },
+      { "command": "agentmux.reloadWindow", "title": "AgentMux-amx: Reload Window" }
     ],
     "configuration": {
-      "title": "AgentMux",
+      "title": "AgentMux-amx",
       "properties": {
         "agentmux.commandPath": {
           "type": "string",
           "default": "amx",
-          "description": "Path to the AgentMux CLI executable."
+          "description": "Path to the AgentMux-amx CLI executable."
         }
       }
     }

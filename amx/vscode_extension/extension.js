@@ -28,7 +28,7 @@ function runAmx(args, timeout = 30000) {
     childProcess.execFile(amxCommand(), args, { encoding: "utf8", timeout }, (error, stdout, stderr) => {
       if (error) {
         if (error.code === "ENOENT") {
-          const missing = new Error("Agent Mux CLI is not installed or is not on PATH.");
+          const missing = new Error("AgentMux-amx CLI is not installed or is not on PATH.");
           missing.code = "AMX_CLI_NOT_FOUND";
           reject(missing);
           return;
@@ -48,20 +48,20 @@ function cliInstallCommand() {
 }
 
 function installCli() {
-  const terminal = vscode.window.createTerminal("Agent Mux Setup");
+  const terminal = vscode.window.createTerminal("AgentMux-amx Setup");
   terminal.show(true);
   terminal.sendText(cliInstallCommand(), true);
-  vscode.window.showInformationMessage("Agent Mux CLI installation started. Restart VS Code when it finishes.");
+  vscode.window.showInformationMessage("AgentMux-amx CLI installation started. Restart VS Code when it finishes.");
 }
 
 async function handleCliError(error) {
   if (error?.code !== "AMX_CLI_NOT_FOUND") return false;
   const action = await vscode.window.showErrorMessage(
-    "Agent Mux needs its local CLI before it can manage accounts.",
-    "Install Agent Mux CLI",
+    "AgentMux-amx needs its local CLI before it can manage accounts.",
+    "Install AgentMux-amx CLI",
     "Configure CLI Path"
   );
-  if (action === "Install Agent Mux CLI") installCli();
+  if (action === "Install AgentMux-amx CLI") installCli();
   if (action === "Configure CLI Path") {
     vscode.commands.executeCommand("workbench.action.openSettings", "agentmux.commandPath");
   }
@@ -77,9 +77,9 @@ async function refreshStatus() {
       : "Open AgentMux";
     statusBar.show();
   } catch (error) {
-    statusBar.text = error.code === "AMX_CLI_NOT_FOUND" ? "$(cloud-download) Agent Mux" : "$(warning) Agent Mux";
+    statusBar.text = error.code === "AMX_CLI_NOT_FOUND" ? "$(cloud-download) AgentMux-amx" : "$(warning) AgentMux-amx";
     statusBar.tooltip = error.code === "AMX_CLI_NOT_FOUND"
-      ? "Agent Mux CLI is required. Click to install or configure it."
+      ? "AgentMux-amx CLI is required. Click to install or configure it."
       : error.message;
     statusBar.show();
   }

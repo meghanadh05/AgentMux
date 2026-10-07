@@ -3,6 +3,7 @@
 ## 0.1.2
 
 - Added guided CLI installation when Agent Mux is installed on a new machine.
+- Renamed the Marketplace extension to AgentMux-amx and adopted the AMX logo.
 
 ## 0.1.1
 

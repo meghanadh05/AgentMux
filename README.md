@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="amx/vscode_extension/images/icon.png" alt="AgentMux" width="160">
+  <img src="amx/vscode_extension/images/logo.png" alt="AMX" width="160">
 </p>
 
-# AgentMux (`amx`)
+# AgentMux-amx (`amx`)
 
 **Switch Codex accounts in your normal VS Code window without separating your local history or editor setup.**
 
