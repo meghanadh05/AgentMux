@@ -270,8 +270,9 @@ class AuthSwitchTests(unittest.TestCase):
         extension = CodexVSCodeManager.classify_process(1, 10, "/x/openai.chatgpt-1/bin/codex app-server")
         terminal = CodexVSCodeManager.classify_process(2, 20, "/opt/homebrew/bin/codex")
         unknown = CodexVSCodeManager.classify_process(3, 30, "/tmp/codex-helper")
-        self.assertEqual([extension.kind, terminal.kind, unknown.kind],
-                         ["vscode-codex", "terminal-codex", "unknown"])
+        empty = CodexVSCodeManager.classify_process(4, 40, "")
+        self.assertEqual([extension.kind, terminal.kind, unknown.kind, empty.kind],
+                         ["vscode-codex", "terminal-codex", "unknown", "unknown"])
 
     @unittest.skipIf(os.name == "nt", "legacy reload bridge uses Unix-domain sockets")
     def test_reload_bridge_prefers_current_workspace_and_newest_registration(self) -> None:

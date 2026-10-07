@@ -493,9 +493,10 @@ class CodexVSCodeManager:
     @staticmethod
     def classify_process(pid: int, ppid: int, command: str) -> ProcessInfo:
         lowered = command.casefold()
+        executable = command.split(maxsplit=1)[0] if command.strip() else ""
         if "openai.chatgpt-" in lowered and "app-server" in lowered:
             kind = "vscode-codex"
-        elif Path(command.split()[0]).name.casefold() in {"codex", "codex.exe"}:
+        elif executable and Path(executable).name.casefold() in {"codex", "codex.exe"}:
             kind = "terminal-codex"
         elif "visual studio code" in lowered or "code helper" in lowered:
             kind = "vscode"
