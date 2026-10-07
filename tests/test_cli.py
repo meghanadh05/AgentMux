@@ -272,6 +272,7 @@ class AuthSwitchTests(unittest.TestCase):
         self.assertEqual([extension.kind, terminal.kind, unknown.kind],
                          ["vscode-codex", "terminal-codex", "unknown"])
 
+    @unittest.skipIf(os.name == "nt", "legacy reload bridge uses Unix-domain sockets")
     def test_reload_bridge_prefers_current_workspace_and_newest_registration(self) -> None:
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -289,6 +290,7 @@ class AuthSwitchTests(unittest.TestCase):
             with patch("amx.codex_vscode.Path.is_socket", return_value=True):
                 self.assertEqual(manager.reload_bridge_socket(), Path("/tmp/Visual Studio Code-2"))
 
+    @unittest.skipIf(os.name == "nt", "legacy reload bridge uses Unix-domain sockets")
     def test_reload_bridge_protocol(self) -> None:
         response = json.dumps({"status": "success"}).encode("utf-8")
 
