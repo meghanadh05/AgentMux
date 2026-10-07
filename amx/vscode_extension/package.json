@@ -2,6 +2,7 @@
   "name": "agentmux-vscode",
   "displayName": "AgentMux",
   "description": "Cross-platform local reload bridge for the AgentMux CLI",
+  "icon": "images/icon.png",
   "version": "0.1.0",
   "publisher": "agentmux",
   "license": "MIT",
