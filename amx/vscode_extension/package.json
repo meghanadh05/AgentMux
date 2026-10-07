@@ -3,7 +3,7 @@
   "displayName": "Agent Mux",
   "description": "Save and switch Codex accounts in your normal VS Code window while preserving shared history and settings.",
   "icon": "images/icon.png",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "megdev",
   "license": "MIT",
   "pricing": "Free",
@@ -27,6 +27,7 @@
     "onStartupFinished",
     "onCommand:agentmux.switchAccount",
     "onCommand:agentmux.addAccount",
+    "onCommand:agentmux.installCli",
     "onCommand:agentmux.refreshStatus",
     "onCommand:agentmux.reloadWindow"
   ],
@@ -42,6 +43,7 @@
     "commands": [
       { "command": "agentmux.switchAccount", "title": "AgentMux: Switch Account" },
       { "command": "agentmux.addAccount", "title": "AgentMux: Add Account" },
+      { "command": "agentmux.installCli", "title": "AgentMux: Install CLI" },
       { "command": "agentmux.refreshStatus", "title": "AgentMux: Refresh Account Status" },
       { "command": "agentmux.reloadWindow", "title": "AgentMux: Reload Window" }
     ],

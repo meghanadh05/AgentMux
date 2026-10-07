@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Added guided CLI installation when Agent Mux is installed on a new machine.
+
 ## 0.1.1
 
 - Added cancellable new-account sign-in with automatic authentication recovery.

@@ -16,7 +16,9 @@ Codex is the only supported provider in this release.
 
 ## Requirements
 
-From the cloned AgentMux repository, install the CLI and companion and keep `amx` available on VS Code's PATH:
+The extension needs the local `amx` CLI. If it is missing, select **Install Agent Mux CLI** from the error prompt or Command Palette. The extension opens an integrated terminal with the install command; restart VS Code after it completes.
+
+To install manually from the cloned repository, keep `amx` available on VS Code's PATH:
 
 ```bash
 python3 -m pip install -e .
@@ -25,6 +27,8 @@ amx doctor
 ```
 
 For a custom executable location, set **AgentMux: Command Path** to the full `amx` path.
+
+The official Codex extension and Codex sign-in are separate requirements. Agent Mux never installs Codex or signs in on your behalf.
 
 ## Account Actions
 

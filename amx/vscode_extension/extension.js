@@ -17,6 +17,7 @@ const agents = [
 
 const renameButton = { iconPath: new vscode.ThemeIcon("edit"), tooltip: "Rename account" };
 const removeButton = { iconPath: new vscode.ThemeIcon("trash"), tooltip: "Remove account" };
+const CLI_SOURCE = "https://github.com/meghanadh05/AgentMux/archive/refs/heads/main.zip";
 
 function amxCommand() {
   return vscode.workspace.getConfiguration("agentmux").get("commandPath", "amx");
@@ -26,6 +27,12 @@ function runAmx(args, timeout = 30000) {
   return new Promise((resolve, reject) => {
     childProcess.execFile(amxCommand(), args, { encoding: "utf8", timeout }, (error, stdout, stderr) => {
       if (error) {
+        if (error.code === "ENOENT") {
+          const missing = new Error("Agent Mux CLI is not installed or is not on PATH.");
+          missing.code = "AMX_CLI_NOT_FOUND";
+          reject(missing);
+          return;
+        }
         const detail = (stderr || error.message || "AgentMux command failed").trim();
         reject(new Error(detail));
         return;
@@ -33,6 +40,32 @@ function runAmx(args, timeout = 30000) {
       resolve(stdout.trim());
     });
   });
+}
+
+function cliInstallCommand() {
+  const python = process.platform === "win32" ? "py" : "python3";
+  return `${python} -m pip install --user "${CLI_SOURCE}"`;
+}
+
+function installCli() {
+  const terminal = vscode.window.createTerminal("Agent Mux Setup");
+  terminal.show(true);
+  terminal.sendText(cliInstallCommand(), true);
+  vscode.window.showInformationMessage("Agent Mux CLI installation started. Restart VS Code when it finishes.");
+}
+
+async function handleCliError(error) {
+  if (error?.code !== "AMX_CLI_NOT_FOUND") return false;
+  const action = await vscode.window.showErrorMessage(
+    "Agent Mux needs its local CLI before it can manage accounts.",
+    "Install Agent Mux CLI",
+    "Configure CLI Path"
+  );
+  if (action === "Install Agent Mux CLI") installCli();
+  if (action === "Configure CLI Path") {
+    vscode.commands.executeCommand("workbench.action.openSettings", "agentmux.commandPath");
+  }
+  return true;
 }
 
 async function refreshStatus() {
@@ -44,8 +77,10 @@ async function refreshStatus() {
       : "Open AgentMux";
     statusBar.show();
   } catch (error) {
-    statusBar.text = "$(warning) AgentMux";
-    statusBar.tooltip = error.message;
+    statusBar.text = error.code === "AMX_CLI_NOT_FOUND" ? "$(cloud-download) Agent Mux" : "$(warning) Agent Mux";
+    statusBar.tooltip = error.code === "AMX_CLI_NOT_FOUND"
+      ? "Agent Mux CLI is required. Click to install or configure it."
+      : error.message;
     statusBar.show();
   }
 }
@@ -210,6 +245,7 @@ async function switchAccount() {
     const agent = await chooseAgent();
     if (agent) await showAccounts(agent);
   } catch (error) {
+    if (await handleCliError(error)) return;
     const action = await vscode.window.showErrorMessage(`AgentMux: ${error.message}`, "Open Settings");
     if (action === "Open Settings") vscode.commands.executeCommand("workbench.action.openSettings", "agentmux.commandPath");
   }
@@ -231,6 +267,7 @@ async function addAccount(selectedAgent) {
     await refreshStatus();
     vscode.window.showInformationMessage(`AgentMux saved the current ${agent.label} session as ${name.trim()}.`);
   } catch (error) {
+    if (await handleCliError(error)) return;
     const action = await vscode.window.showErrorMessage(`AgentMux: ${error.message}`, "Open Settings");
     if (action === "Open Settings") {
       vscode.commands.executeCommand("workbench.action.openSettings", "agentmux.commandPath");
@@ -297,6 +334,7 @@ function activate(context) {
     addStatusBar,
     vscode.commands.registerCommand("agentmux.switchAccount", switchAccount),
     vscode.commands.registerCommand("agentmux.addAccount", addAccount),
+    vscode.commands.registerCommand("agentmux.installCli", installCli),
     vscode.commands.registerCommand("agentmux.refreshStatus", refreshStatus),
     vscode.commands.registerCommand("agentmux.reloadWindow", () =>
       vscode.commands.executeCommand("workbench.action.reloadWindow")),
