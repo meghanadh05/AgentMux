@@ -1,12 +1,24 @@
 {
   "name": "agentmux-vscode",
   "displayName": "AgentMux",
-  "description": "Cross-platform local reload bridge for the AgentMux CLI",
+  "description": "Save and switch Codex accounts in your normal VS Code window while preserving shared history and settings.",
   "icon": "images/icon.png",
   "version": "0.1.0",
-  "publisher": "agentmux",
+  "publisher": "meghanadh05",
   "license": "MIT",
   "pricing": "Free",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/meghanadh05/AgentMux.git"
+  },
+  "homepage": "https://github.com/meghanadh05/AgentMux#readme",
+  "bugs": {
+    "url": "https://github.com/meghanadh05/AgentMux/issues"
+  },
+  "galleryBanner": {
+    "color": "#111111",
+    "theme": "dark"
+  },
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other"],
   "keywords": ["codex", "accounts", "switcher", "agent"],
@@ -20,8 +32,8 @@
   ],
   "main": "./extension.js",
   "scripts": {
-    "package": "vsce package --allow-missing-repository --no-dependencies",
-    "publish": "vsce publish --allow-missing-repository --no-dependencies"
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies"
   },
   "devDependencies": {
     "@vscode/vsce": "^3.6.2"

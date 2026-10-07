@@ -5,9 +5,8 @@ The extension source lives in `amx/vscode_extension/`. Publishing requires a uni
 ## Prepare
 
 1. Create a publisher at the [Visual Studio Marketplace publisher management page](https://marketplace.visualstudio.com/manage/publishers/).
-2. Replace `agentmux` in the extension's `publisher` field if that publisher ID is unavailable.
-3. Add the public repository, homepage, bugs URL, and a PNG icon of at least 128 by 128 pixels before the first public release.
-4. Update the version and changelog.
+2. Confirm the manifest publisher ID is `meghanadh05`.
+3. Update the version and changelog.
 
 ## Validate And Package
 
@@ -28,7 +27,7 @@ code --install-extension agentmux-vscode-<version>.vsix
 For an initial manual release, authenticate `vsce` with the publisher credentials and publish:
 
 ```bash
-npx vsce login <publisher-id>
+npx vsce login meghanadh05
 npm run publish
 ```
 
