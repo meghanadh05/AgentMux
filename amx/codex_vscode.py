@@ -501,7 +501,7 @@ class CodexVSCodeManager:
         commands = {item.pid: item.command for item in processes}
         return {item.pid for item in processes if item.kind == "vscode-codex"
                 and "--user-data-dir" in commands.get(item.ppid, "")
-                and self._is_default_vscode_command(commands[item.ppid])}
+                and self._is_default_vscode_command(commands.get(item.ppid, ""))}
 
     @staticmethod
     def _is_default_vscode_command(command: str) -> bool:

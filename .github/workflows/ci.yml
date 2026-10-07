@@ -19,3 +19,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: python -m pip install -e .
       - run: python -m unittest discover -s tests
+      - run: npm ci
+        working-directory: amx/vscode_extension
+      - run: node --check extension.js
+        working-directory: amx/vscode_extension
+      - run: npm run package
+        working-directory: amx/vscode_extension

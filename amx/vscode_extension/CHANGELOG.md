@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Verified CLI and extension packaging on macOS, Windows, and Linux in CI.
+- Hardened VS Code process inspection when a parent process is unavailable.
+
 ## 0.1.3
 
 - Made the one-click CLI setup install and configure `amx` automatically.

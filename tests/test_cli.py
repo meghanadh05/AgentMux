@@ -8,7 +8,7 @@ from unittest.mock import patch
 import unittest
 
 from amx.cli import main
-from amx.codex_vscode import CompanionBridge, CodexVSCodeManager, RefreshMethod, _ExclusiveLock
+from amx.codex_vscode import CompanionBridge, CodexVSCodeManager, ProcessInfo, RefreshMethod, _ExclusiveLock
 from amx.config import ConfigStore
 
 
@@ -390,6 +390,13 @@ class AuthSwitchTests(unittest.TestCase):
             r"Code.exe --user-data-dir=C:\\Users\\me\\AppData\\Roaming\\Code",
         ]
         self.assertTrue(all(CodexVSCodeManager._is_default_vscode_command(value) for value in commands))
+
+    def test_default_vscode_process_detection_ignores_missing_parent(self) -> None:
+        with TemporaryDirectory() as tmp:
+            manager = self.manager(Path(tmp))
+            app_server = ProcessInfo(42, 999, "vscode-codex", "codex app-server")
+            with patch.object(manager, "inspect_processes", return_value=[app_server]):
+                self.assertEqual(manager.default_app_server_pids(), set())
 
     def test_companion_install_uses_vscode_cli(self) -> None:
         with TemporaryDirectory() as tmp:
