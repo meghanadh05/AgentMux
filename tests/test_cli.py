@@ -32,7 +32,8 @@ class AuthSwitchTests(unittest.TestCase):
             manager = self.manager(Path(tmp))
             account = self.register(manager, "Personal", "personal")
             self.assertEqual(manager.account_auth(account).read_bytes(), manager.live_auth.read_bytes())
-            self.assertEqual(manager.account_auth(account).stat().st_mode & 0o777, 0o600)
+            if os.name != "nt":
+                self.assertEqual(manager.account_auth(account).stat().st_mode & 0o777, 0o600)
             self.assertEqual(manager.get_active_account().name, "Personal")
 
     def test_login_add_preserves_previous_and_saves_new_authentication(self) -> None:
